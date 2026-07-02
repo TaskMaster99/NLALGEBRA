@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/test.dir/link.d CMakeFiles/test.dir/test.cpp.o -o test  ../_deps/catch2-build/src/libCatch2Main.a ../_deps/fmt-build/libfmt.a ../_deps/catch2-build/src/libCatch2.a

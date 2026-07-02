@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/CMakeFiles/catch-populate"
+		},
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/CMakeFiles/catch-populate.rule"
+		},
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/CMakeFiles/catch-populate-complete.rule"
+		},
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/catch-populate-prefix/src/catch-populate-stamp/catch-populate-build.rule"
+		},
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/catch-populate-prefix/src/catch-populate-stamp/catch-populate-configure.rule"
+		},
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/catch-populate-prefix/src/catch-populate-stamp/catch-populate-download.rule"
+		},
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/catch-populate-prefix/src/catch-populate-stamp/catch-populate-install.rule"
+		},
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/catch-populate-prefix/src/catch-populate-stamp/catch-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/catch-populate-prefix/src/catch-populate-stamp/catch-populate-patch.rule"
+		},
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/catch-populate-prefix/src/catch-populate-stamp/catch-populate-test.rule"
+		},
+		{
+			"file" : "/home/prince/NLA/project/NLALGEBRA/build/_deps/catch-subbuild/catch-populate-prefix/src/catch-populate-stamp/catch-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"catch-populate"
+		],
+		"name" : "catch-populate"
+	}
+}
