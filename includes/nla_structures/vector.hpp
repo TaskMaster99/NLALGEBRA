@@ -2,63 +2,90 @@
 
 #include <nla_tools.hpp>
 
-namespace nla
+namespace NLA
 {
     /**
      * @struct
-     * @brief vector n
-     * @param num_element number of elements
+     * @brief DenseVector n
+     * @param n number of elements
      * @param data sets of scalar
      */
-    template <typename T, int n>
-    struct vector
+    template <typename T>
+    struct DenseVector
     {
-        int num_element;
-        T data[n];
+        int n;
+        T *data;
 
-        constexpr vector() : num_element(n) {};
-        constexpr vector(const T k) : num_element(n)
+        DenseVector() : n(4), data((T *)std::malloc(4 * sizeof(T)))
         {
-            for (int i = 0; i < num_element; ++i)
+            for (int i = 0; i < n; ++i)
+                data[i] = static_cast<T>(0);
+        };
+        DenseVector(const int nl) : n(nl), data((T *)std::malloc(nl * sizeof(T)))
+        {
+            for (int i = 0; i < n; ++i)
+                data[i] = static_cast<T>(0);
+        }
+        DenseVector(const T k, const int nl) : n(nl), data((T *)std::malloc(nl * sizeof(T)))
+        {
+            for (int i = 0; i < n; ++i)
                 data[i] = k;
         }
-        constexpr vector(const T *data) : num_element(n)
+        DenseVector(const T *data, const int nl) : n(nl), data((T *)std::malloc(nl * sizeof(T)))
         {
-            for (int i = 0; i < num_element; ++i)
+            for (int i = 0; i < n; ++i)
                 this->data[i] = data[i];
         }
 
-        constexpr vector(const vector<T, n> &u) : num_element(u.num_element)
+        DenseVector(const DenseVector<T> &u) : n(u.n), data((T *)std::malloc(u.n * sizeof(T)))
         {
-            for (int i = 0; i < num_element; ++i)
+            for (int i = 0; i < n; ++i)
                 this->data[i] = u.data[i];
         }
 
-        [[gnu::__always_inline__]] inline constexpr vector &operator=(const T *data)
+        ~DenseVector()
         {
-            for (int i = 0; i < num_element; ++i)
+            if (data)
+                free(data);
+        }
+
+        [[gnu::always_inline]] inline DenseVector &operator=(const T *data)
+        {
+            for (int i = 0; i < n; ++i)
                 this->data[i] = data[i];
 
             return *this;
         }
 
-        [[gnu::__always_inline__]] inline constexpr vector &operator=(const vector<T, n> &u)
+        [[gnu::always_inline]] inline DenseVector &operator=(const DenseVector<T> &u)
         {
-            for (int i = 0; i < num_element; ++i)
+            for (int i = 0; i < n; ++i)
                 this->data[i] = data[i];
 
             return *this;
         }
 
-        [[gnu::__always_inline__]] inline constexpr T &operator[](int i)
+        [[gnu::always_inline]] inline T &operator[](int i)
         {
-            ASSERTM(i < num_element, "Out of border !!\n");
+            ASSERTM(i < n, "Out of border !!\n");
             return data[i];
         }
 
-        [[gnu::__always_inline__]] inline constexpr T operator[](int i) const
+        [[gnu::always_inline]] inline T operator[](int i) const
         {
-            ASSERTM(i < num_element, "Out of border !!\n");
+            ASSERTM(i < n, "Out of border !!\n");
+            return data[i];
+        }
+
+        [[gnu::always_inline]] inline T &operator()(int i)
+        {
+            ASSERTM(i < n, "Out of border !!\n");
+            return data[i];
+        }
+
+        [[gnu::always_inline]] inline T operator()(int i) const
+        {
+            ASSERTM(i < n, "Out of border !!\n");
             return data[i];
         }
     };

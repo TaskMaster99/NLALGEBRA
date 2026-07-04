@@ -2,47 +2,57 @@
 
 #include <nla_tools.hpp>
 
-namespace nla
+namespace NLA
 {
+
     /**
      * @struct
      * @brief Column Major Matrix mxn
-     * @param num_row the
      */
-    template <typename T, int m, int n>
-    struct matrix
+    template <typename T>
+    struct DenseMatrix
     {
-        int num_row;
-        int num_column;
-        T data[m * n];
+        int m = 0;
+        int n = 0;
+        T *data = nullptr;
 
-        constexpr matrix() : num_row(m), num_column(n)
+        DenseMatrix() {}
+        DenseMatrix(const T k, int ml, int nl) : m(ml), n(nl), data((T *)std::malloc(ml * nl * sizeof(T)))
         {
             const int size = m * n;
+            data = (T *)std::malloc(size * sizeof(T));
+            for (int i = 0; i < size; ++i)
+                data[i] = static_cast<T>(k);
+        }
+        DenseMatrix(int ml, int nl) : m(ml), n(nl), data((T *)std::malloc(ml * nl * sizeof(T)))
+        {
+            const int size = m * n;
+            data = (T *)std::malloc(size * sizeof(T));
             for (int i = 0; i < size; ++i)
                 data[i] = static_cast<T>(0);
         }
-        constexpr matrix(const T k)
-        {
-            const int size = m * n;
-            for (int i = 0; i < size; ++i)
-                data[i] = k;
-        }
-        constexpr matrix(const T *data)
+
+        DenseMatrix(const T *data, int ml, int nl) : m(ml), n(nl), data((T *)std::malloc(ml * nl * sizeof(T)))
         {
             for (int j = 0; j < n; ++j)
                 for (int i = 0; i < m; ++i)
                     this->data[j * m + i] = data[i * n + j];
         }
 
-        constexpr matrix(const matrix<T, m, n> &A)
+        DenseMatrix(const DenseMatrix<T> &A) : m(A.m), n(A.n), data((T *)std::malloc(A.m * A.n * sizeof(T)))
         {
             const int size = m * n;
             for (int i = 0; i < size; ++i)
                 this->data[i] = A.data[i];
         }
 
-        [[gnu::__always_inline__]] inline constexpr matrix &operator=(const T *data)
+        ~DenseMatrix()
+        {
+            if (data)
+                free(data);
+        }
+
+        [[gnu::always_inline]] inline DenseMatrix &operator=(const T *data)
         {
             const int size = m * n;
             for (int i = 0; i < size; ++i)
@@ -51,25 +61,44 @@ namespace nla
             return *this;
         }
 
-        [[gnu::__always_inline__]] inline constexpr matrix &operator=(const matrix<T, m, n> &A)
+        [[gnu::always_inline]] inline DenseMatrix &operator=(const DenseMatrix<T> &A)
         {
+            m = A.m;
+            n = A.n;
+
             const int size = m * n;
+
+            data = (T *)std::malloc(m * n * sizeof(T));
+
             for (int i = 0; i < size; ++i)
                 this->data[i] = A.data[i];
 
             return *this;
         }
 
-        [[gnu::__always_inline__]] inline constexpr T &operator[](int i)
+        [[gnu::always_inline]] inline T &operator[](int i)
         {
-            ASSERTM(i < (n * m), "Out of border !!\n");
+            ASSERTM(i < (m * n), "Out of border !!\n");
             return data[i];
         }
 
-        [[gnu::__always_inline__]] inline constexpr T operator[](int i) const
+        [[gnu::always_inline]] inline T operator[](int i) const
         {
-            ASSERTM(i < (n * m), "Out of border !!\n");
+            ASSERTM(i < (m * n), "Out of border !!\n");
             return data[i];
         }
+
+        [[gnu::always_inline]] inline T &operator()(int i, int j)
+        {
+            ASSERTM((j * m + i) < (m * n), "Out of border !!\n");
+            return data[j * m + i];
+        }
+
+        [[gnu::always_inline]] inline T operator()(int i, int j) const
+        {
+            ASSERTM((j * m + i) < (m * n), "Out of border !!\n");
+            return data[j * m + i];
+        }
     };
+
 };
