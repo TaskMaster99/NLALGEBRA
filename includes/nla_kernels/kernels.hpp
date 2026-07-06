@@ -172,36 +172,55 @@ namespace NLA
     }
 
     template <typename T>
-    [[gnu::always_inline]] inline const DenseMatrix<T> pivot(const DenseMatrix<T> &A, int h, int l)
+    [[gnu::always_inline]] inline void permut(DenseMatrix<T> &A, int h, int l)
     {
-        DenseMatrix<T> P(A);
         for (int j = 0; j < A.n; ++j)
-        {
-            const T piv = A(h, j);
-            P(h, j) = A(l, j);
-            P(l, j) = piv;
-        }
-
-        return P;
+            swap(A(h, j), A(l,j));
     }
+
+
 
     template <typename T>
     [[gnu::always_inline]] inline void LU_Decomposition(const DenseMatrix<T> &A, DenseMatrix<T> &L, DenseMatrix<T> &U)
     {
         U = A;
         L = identity<T>(A.m, A.n);
-        T k(0);
         for (int l = 0; l < U.m; ++l)
         {
-            if(U(l, l) == T(0))
+            for (int d = l + 1; d < U.m; ++d)
+            {
+                const T pivot = U(d, l) / U(l, l);
+                L(d, l) = pivot;
+
+                for (int c = l; c < U.n; ++c)
+                {
+                    U(d, c) -= pivot * U(l, c);
+                }
+            }
+        }
+    }
+
+
+    template <typename T>
+    [[gnu::always_inline]] inline void PLU_Decomposition(const DenseMatrix<T> &A, DenseMatrix<T> &P, DenseMatrix<T> &L, DenseMatrix<T> &U)
+    {
+        U = A;
+        L = identity<T>(A.m, A.n);
+        P = identity<T>(A.m, A.n);
+        for (int l = 0; l < U.m; ++l)
+        {
+            if(-T(EPSILON32_LV1) <=  U(l, l) && U(l,l) <= T(EPSILON32_LV1))
             {
                 int offset = l + 1;
                 do
                 {
-                    if (U(offset, l) != T(0))
+                    if (U(offset, l) > T(EPSILON32_LV1))
                     {
-                        U = pivot(U, offset, l);
-                        swap(L(offset, l-1), L(l, l-1));
+                        permut(U, offset, l);
+                        permut(P, offset, l);
+
+                        for(int i = 0; i < l; ++i)
+                            swap(L(offset, i), L(l, i));
                         break;
                     }
 
@@ -210,12 +229,12 @@ namespace NLA
 
             for (int d = l + 1; d < U.m; ++d)
             {
-                k = U(d, l) / U(l, l);
-                L(d, l) = k;
+                const T pivot = U(d, l) / U(l, l);
+                L(d, l) = pivot;
 
                 for (int c = l; c < U.n; ++c)
                 {
-                    U(d, c) -= k * U(l, c);
+                    U(d, c) -= pivot * U(l, c);
                 }
             }
         }

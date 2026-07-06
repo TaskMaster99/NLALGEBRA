@@ -3,87 +3,88 @@
 
 #include <nla_kernels/kernels.hpp>
 
-TEST_CASE("Matrix kernels", "[Matrix]")
+using namespace Catch::Matchers;
+
+TEST_CASE("Matrix kernels", "[LU Decompostion]")
 {
-    const float aa[9] = {
+    const float a[9] = {
         1.0f, 2.0f, 3.0f,
         4.0f, 5.0f, 6.0f,
         7.0f, 8.0f, 9.0f};
 
-    const float aaa[9] = {
-        1.0f, 2.0f, 3.0f,
-        4.0f, 5.0f, 6.0f,
-        7.0f, 8.0f, 9.0f};
+    const NLA::DenseMatrix<float> A(a, 3, 3);
 
-    const float aaaa[9] = {
-        1.0f, 2.0f, 3.0f,
-        4.0f, 8.0f, 6.0f,
-        7.0f, 8.0f, 9.0f};
+    NLA::DenseMatrix<float> U0;
+    NLA::DenseMatrix<float> L0;
 
-    const float bb[9] = {
-        5.0f, 2.0f, 3.0f,
-        4.0f, 12.0f, 6.0f,
-        -7.0f, 8.0f, -9.0f};
+    NLA::DenseMatrix<float> P;
+    NLA::DenseMatrix<float> U1;
+    NLA::DenseMatrix<float> L1;
 
-    const float xx[3] = {
-        -11.0f,
-        2.0f,
-        73.0f};
+    NLA::LU_Decomposition(A, L0, U0);
 
 
-    const NLA::DenseMatrix<float> A(aa, 3, 3);
-    const NLA::DenseMatrix<float> B(bb, 3, 3);
-    const NLA::DenseMatrix<float> C = NLA::mul<float>(A, B);
-    const NLA::DenseVector<float> x(xx, 3);
-    const NLA::DenseVector<float> b = NLA::mul<float>(A, x);
-    const NLA::DenseMatrix<float> AA(aaa, 3, 3);
-    const NLA::DenseMatrix<float> AAA(aaaa, 3, 3);
+    REQUIRE(U0[0] == 1.0f);REQUIRE(U0[3] ==  2.0f);REQUIRE(U0[6] ==   3.0f);
+    REQUIRE(U0[1] == 0.0f);REQUIRE(U0[4] == -3.0f);REQUIRE(U0[7] ==  -6.0f);
+    REQUIRE(U0[2] == 0.0f);REQUIRE(U0[5] ==  0.0f);REQUIRE(U0[8] ==   0.0f);
+}
 
-    const NLA::DenseMatrix<float> P = NLA::pivot(AA, 1, 2);
 
-    NLA::DenseMatrix<float> U;
-    NLA::DenseMatrix<float> L;
+TEST_CASE("Matrix kernels", "[LU Decompostion with permutation]")
+{
+    const float a[16] = {
+        1.0f, 0.0f, 1.0f, 1.0f,
+        0.0f, 1.0f, 1.0f, 1.0f,
+        0.0f, 2.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 3.0f, 1.0f};
 
-    NLA::LU_Decomposition(AAA, L, U);
+    const float c[25] = {
+     1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+     2.0f, 3.0f, 3.0f, 3.0f, 3.0f,
+     1.0f, 4.0f, 6.0f, 6.0f, 6.0f,
+     1.0f, 1.0f, 5.0f, 8.0f, 8.0f,
+     1.0f, 1.0f, 1.0f, 6.0f, 10.0f};
 
-    REQUIRE(A[0] == 1.0f);REQUIRE(A[3] == 2.0f);REQUIRE(A[6] == 3.0f);
-    REQUIRE(A[1] == 4.0f);REQUIRE(A[4] == 5.0f);REQUIRE(A[7] == 6.0f);
-    REQUIRE(A[2] == 7.0f);REQUIRE(A[5] == 8.0f);REQUIRE(A[8] == 9.0f);
+    const NLA::DenseMatrix<float> A(a, 4, 4);
+    const NLA::DenseMatrix<float> C(c, 5, 5);
 
-    REQUIRE(B[0] ==  5.0f);REQUIRE(B[3] ==  2.0f);REQUIRE(B[6] ==  3.0f);
-    REQUIRE(B[1] ==  4.0f);REQUIRE(B[4] == 12.0f);REQUIRE(B[7] ==  6.0f);
-    REQUIRE(B[2] == -7.0f);REQUIRE(B[5] ==  8.0f);REQUIRE(B[8] == -9.0f);
+    NLA::DenseMatrix<float> P1;
+    NLA::DenseMatrix<float> U1;
+    NLA::DenseMatrix<float> L1;
 
-    REQUIRE(C[0] == -8.0f);
-    REQUIRE(C[1] == -2.0f);
-    REQUIRE(C[2] == 4.0f);
+    NLA::PLU_Decomposition(A, P1, L1, U1);
 
-    REQUIRE(C[3] == 50.0f);
-    REQUIRE(C[4] == 116.0f);
-    REQUIRE(C[5] == 182.0f);
+    NLA::DenseMatrix<float> P2;
+    NLA::DenseMatrix<float> U2;
+    NLA::DenseMatrix<float> L2;
 
-    REQUIRE(C[6] == -12.0f);
-    REQUIRE(C[7] == -12.0f);
-    REQUIRE(C[8] == -12.0f);
+    NLA::PLU_Decomposition(C, P2, L2, U2);
 
-    REQUIRE(x[0] == -11.0f);
-    REQUIRE(x[1] == 2.0f);
-    REQUIRE(x[2] == 73.0f);
+    REQUIRE(U1[0] == 1.0f);REQUIRE(U1[4] ==  0.0f);REQUIRE(U1[8]  ==   1.0f);REQUIRE(U1[12] ==  1.0f);
+    REQUIRE(U1[1] == 0.0f);REQUIRE(U1[5] ==  1.0f);REQUIRE(U1[9]  ==   1.0f);REQUIRE(U1[13] ==  1.0f);
+    REQUIRE(U1[2] == 0.0f);REQUIRE(U1[6] ==  0.0f);REQUIRE(U1[10] ==  -2.0f);REQUIRE(U1[14] == -1.0f);
+    REQUIRE(U1[3] == 0.0f);REQUIRE(U1[7] ==  0.0f);REQUIRE(U1[11] ==   0.0f);REQUIRE(U1[15] == -0.5f);
 
-    REQUIRE(b[0] == 212.0f);
-    REQUIRE(b[1] == 404.0f);
-    REQUIRE(b[2] == 596.0f);
 
-    REQUIRE(P[0] == 1.0f);REQUIRE(P[3] == 2.0f);REQUIRE(P[6] == 3.0f);
-    REQUIRE(P[1] == 7.0f);REQUIRE(P[4] == 8.0f);REQUIRE(P[7] == 9.0f);
-    REQUIRE(P[2] == 4.0f);REQUIRE(P[5] == 5.0f);REQUIRE(P[8] == 6.0f);
+    REQUIRE(L1[0] == 1.0f);REQUIRE(L1[4] == 0.0f);REQUIRE(L1[8]  ==  0.0f);REQUIRE(L1[12] == 0.0f);
+    REQUIRE(L1[1] == 0.0f);REQUIRE(L1[5] == 1.0f);REQUIRE(L1[9]  ==  0.0f);REQUIRE(L1[13] == 0.0f);
+    REQUIRE(L1[2] == 0.0f);REQUIRE(L1[6] == 2.0f);REQUIRE(L1[10] ==  1.0f);REQUIRE(L1[14] == 0.0f);
+    REQUIRE(L1[3] == 0.0f);REQUIRE(L1[7] == 0.0f);REQUIRE(L1[11] == -1.5f);REQUIRE(L1[15] == 1.0f);
 
-    REQUIRE(U[0] == 1.0f);REQUIRE(U[3] ==  2.0f);REQUIRE(U[6] ==   3.0f);
-    REQUIRE(U[1] == 0.0f);REQUIRE(U[4] == -6.0f);REQUIRE(U[7] == -12.0f);
-    REQUIRE(U[2] == 0.0f);REQUIRE(U[5] ==  0.0f);REQUIRE(U[8] ==  -6.0f);
-    
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    REQUIRE(L[0] == 1.0f);REQUIRE(L[3] == 0.0f);REQUIRE(L[6] == 0.0f);
-    REQUIRE(L[1] == 7.0f);REQUIRE(L[4] == 1.0f);REQUIRE(L[7] == 0.0f);
-    REQUIRE(L[2] == 4.0f);REQUIRE(L[5] == 0.0f);REQUIRE(L[8] == 1.0f);
+
+    REQUIRE(U2[0] == 1.0f);REQUIRE(U2[5] == 1.0f);REQUIRE(U2[10]  ==  1.0f);REQUIRE(U2[15] == 1.0f);REQUIRE(U2[20] == 1.0f);
+    REQUIRE(U2[1] == 0.0f);REQUIRE(U2[6] == 1.0f);REQUIRE(U2[11]  ==  1.0f);REQUIRE(U2[16] == 1.0f);REQUIRE(U2[21] == 1.0f);
+    REQUIRE(U2[2] == 0.0f);REQUIRE(U2[7] == 0.0f);REQUIRE(U2[12]  ==  2.0f);REQUIRE(U2[17] == 2.0f);REQUIRE(U2[22] == 2.0f);
+    REQUIRE(U2[3] == 0.0f);REQUIRE(U2[8] == 0.0f);REQUIRE(U2[13]  ==  0.0f);REQUIRE(U2[18] == 3.0f);REQUIRE(U2[23] == 3.0f);
+    REQUIRE(U2[4] == 0.0f);REQUIRE(U2[9] == 0.0f);REQUIRE(U2[14]  ==  0.0f);REQUIRE_THAT(U2[19], WithinAbs(0.0f, EPSILON32_LV2));REQUIRE(U2[24] == 4.0f);
+
+
+    REQUIRE(L2[0] == 1.0f);REQUIRE(L2[5] == 0.0f);REQUIRE(L2[10]  ==  0.0f);REQUIRE(L2[15] == 0.0f);REQUIRE(L2[20] == 0.0f);
+    REQUIRE(L2[1] == 2.0f);REQUIRE(L2[6] == 1.0f);REQUIRE(L2[11]  ==  0.0f);REQUIRE(L2[16] == 0.0f);REQUIRE(L2[21] == 0.0f);
+    REQUIRE(L2[2] == 1.0f);REQUIRE(L2[7] == 3.0f);REQUIRE(L2[12]  ==  1.0f);REQUIRE(L2[17] == 0.0f);REQUIRE(L2[22] == 0.0f);
+    REQUIRE(L2[3] == 1.0f);REQUIRE(L2[8] == 0.0f);REQUIRE(L2[13]  ==  2.0f);REQUIRE(L2[18] == 1.0f);REQUIRE(L2[23] == 0.0f);
+    REQUIRE(L2[4] == 1.0f);REQUIRE(L2[9] == 0.0f);REQUIRE(L2[14]  ==  0.0f);REQUIRE_THAT(L2[19], WithinAbs(1.66666667f, EPSILON32_LV1));REQUIRE(L2[24] == 1.0f);
+
 }
