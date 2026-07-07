@@ -2,7 +2,9 @@
 
 #include <cassert>
 #include <fmt/core.h>
+#include <random>
 
+#define EPSILON32_LV0 1e-1f
 #define EPSILON32_LV1 1e-3f
 #define EPSILON32_LV2 1e-6f
 #define EPSILON32_LV3 1e-9f

@@ -77,6 +77,21 @@ namespace NLA
 {
 
     template <typename T>
+    [[gnu::always_inline]] inline const DenseMatrix<T> random(int m, int n, T begin, T end)
+    {
+        DenseMatrix<T> A(m, n);
+        std::random_device rd;
+        std::uniform_real_distribution<T> dist(begin, end);
+        for(int j = 0; j < A.n; ++j)
+        {
+            for(int i = 0; i < A.m; ++i)
+                A(i,j) = dist(rd);
+        }
+        
+        return A;
+    }
+
+    template <typename T>
     [[gnu::always_inline]] inline const DenseMatrix<T> identity(int m, int n)
     {
         DenseMatrix<T> C(m, n);
@@ -209,23 +224,24 @@ namespace NLA
         P = identity<T>(A.m, A.n);
         for (int l = 0; l < U.m; ++l)
         {
-            if(-T(EPSILON32_LV1) <=  U(l, l) && U(l,l) <= T(EPSILON32_LV1))
+            int max_line_pivot = l;
+            T max_pivot_value = U(l,l);
+
+            for(int i = l;i < U.n; ++i)
             {
-                int offset = l + 1;
-                do
+                if(std::abs(U(i,l)) > std::abs(max_pivot_value))
                 {
-                    if (U(offset, l) > T(EPSILON32_LV1))
-                    {
-                        permut(U, offset, l);
-                        permut(P, offset, l);
-
-                        for(int i = 0; i < l; ++i)
-                            swap(L(offset, i), L(l, i));
-                        break;
-                    }
-
-                } while (++offset < U.n);
+                    max_pivot_value = U(i,l);
+                    max_line_pivot  = i;
+                }
             }
+                
+            permut(U, max_line_pivot, l);
+            permut(P, max_line_pivot, l);
+
+            for(int i = 0; i < l; ++i)
+                swap(L(max_line_pivot, i), L(l, i));
+            
 
             for (int d = l + 1; d < U.m; ++d)
             {
