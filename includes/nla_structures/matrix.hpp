@@ -32,8 +32,21 @@ namespace NLA
                 data[i] = static_cast<T>(0);
         }
 
-        DenseMatrix(const T *data, int ml, int nl) : m(ml), n(nl), data((T *)std::malloc(ml * nl * sizeof(T)))
+        DenseMatrix(int ml, int nl, const T *data) : m(ml), n(nl), data((T *)std::malloc(ml * nl * sizeof(T)))
         {
+            for (int j = 0; j < n; ++j)
+                for (int i = 0; i < m; ++i)
+                    this->data[j * m + i] = data[i * n + j];
+        }
+
+        template<typename ...Types>
+        DenseMatrix(int ml, int nl, Types... scalar) : m(ml), n(nl), data((T *)std::malloc(ml * nl * sizeof(T)))
+        {
+            for(int i = 0; i < ml * nl; ++i)
+                this->data[i] = static_cast<T>(0);
+
+            T data[] = { static_cast<T>(scalar)... };
+            
             for (int j = 0; j < n; ++j)
                 for (int i = 0; i < m; ++i)
                     this->data[j * m + i] = data[i * n + j];

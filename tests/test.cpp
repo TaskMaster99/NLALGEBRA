@@ -29,6 +29,19 @@ void matching_matrix_test(const NLA::DenseMatrix<T>& A, const NLA::DenseMatrix<T
     }
 }
 
+TEST_CASE("Matrix Implemantation", "[Matrix Constructors]")
+{
+    NLA::DenseMatrix<float> A = 
+    {
+        3, 3,
+        1.0f, 2.0f, 3.0f,
+        4.0f, 5.0f, 6.0f,
+        7.0f, 8.0f, 9.0f
+    };
+
+    print(A);
+}
+
 TEST_CASE("Matrix kernels", "[LU Decompostion]")
 {
     const float a[9] = {
@@ -36,7 +49,7 @@ TEST_CASE("Matrix kernels", "[LU Decompostion]")
         4.0f, 5.0f, 6.0f,
         7.0f, 8.0f, 9.0f};
 
-    const NLA::DenseMatrix<float> A(a, 3, 3);
+    const NLA::DenseMatrix<float> A(3, 3, a);
 
     NLA::DenseMatrix<float> U0;
     NLA::DenseMatrix<float> L0;
