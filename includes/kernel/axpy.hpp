@@ -49,7 +49,7 @@ void saxpy(float sa, const float* sx, float* sy, int N)
  * @param dy Double-precision scalar vector
  * @param N  Size of the vectors
  */
-void daxpy(float da, const float* dx, float* dy, int N)
+void daxpy(double da, const double* dx, double* dy, int N)
 {
     if(!da)    return;
     if(!dx)    return;
@@ -134,7 +134,7 @@ void saxpby(float sa, const float* sx, float sb, float* sy, int N)
  * @param dy Double-precision scalar vector
  * @param N  Size of the vectors
  */
-void daxpby(float da, const float* dx, float db, float* dy, int N)
+void daxpby(double da, const double* dx, double db, double* dy, int N)
 {
     if(!da)    return;
     if(!dx)    return;

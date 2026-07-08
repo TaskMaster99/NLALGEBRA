@@ -49,7 +49,7 @@ float sdot(const float* sx, const float* sy, int N)
  * @param dy Double-precision scalar vector
  * @return Double-precision scalar result
  */
-float sdot(const float* dx, const float* dy, int N)
+float ddot(const double* dx, const double* dy, int N)
 {
     if(!dx)    return __FLT_NORM_MAX__;
     if(!dy)    return __FLT_NORM_MAX__;
@@ -59,7 +59,7 @@ float sdot(const float* dx, const float* dy, int N)
     int offset = !n ? 4 : 1;
     int i      =  0;
 
-    float res  =  0.0f;
+    double res  =  0.0f;
     if(!n)
     {
         do
