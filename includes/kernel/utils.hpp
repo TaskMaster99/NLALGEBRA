@@ -15,3 +15,6 @@
 #define dA(i,j) dA[j * P + i]
 #define dB(i,j) dB[j * N + i]
 #define dC(i,j) dC[j * N + i]
+
+#define COMPATIBLE_128BIT 4
+#define COMPATIBLE_256BIT 8

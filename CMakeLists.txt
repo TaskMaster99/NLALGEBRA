@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.20)
 
-project(NLA LANGUAGES CXX)
-
+project(NLA LANGUAGES CXX ASM_NASM)
+enable_language(ASM_NASM)
 include(FetchContent)
 
 FetchContent_Declare(

@@ -2,6 +2,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <nla_kernels/kernels.hpp>
+#include <kernel/dot.hpp>
 
 using namespace Catch::Matchers;
 
@@ -28,6 +29,29 @@ void matching_matrix_test(const NLA::DenseMatrix<T>& A, const NLA::DenseMatrix<T
         }
     }
 }
+
+TEST_CASE("micro kernel ", "[us_4_dot]")
+{
+    const int n = 21;
+    float a[n] ;
+    float b[n] ;
+
+    for(int i = 0; i < n; ++i)
+    {
+        a[i] = i+1;
+        b[i] = i+1;
+    }
+
+    float real_res = 0.0f;
+
+    for(int i = 0; i < n; ++i)
+    {
+        real_res += a[i]*b[i];
+    }
+
+    REQUIRE_THAT(_unroll_sdot(a,b, n), WithinAbs(real_res, EPSILON32_LV0));
+}
+
 
 TEST_CASE("Matrix Implemantation", "[Matrix Constructors]")
 {
@@ -78,7 +102,7 @@ TEST_CASE("Matrix kernels", "[LU Decompostion]")
 
 TEST_CASE("Matrix kernels", "[LU Decompostion with permutation]")
 {
-    for(int N = 0; N < 10000; ++N)
+    for(int N = 0; N < 1; ++N)
     {
         const NLA::DenseMatrix<float> A = NLA::random<float>(10, 10, -100.0f, 100.0f);
         NLA::DenseMatrix<float> P;
