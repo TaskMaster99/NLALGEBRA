@@ -2,148 +2,256 @@ section .data
 section .bss
 section .text
 
-global us_8_dot
-global ud_4_dot
-global _sdot
-global _unroll_sdot
+global SDOT
+global DDOT
 
+SDOT:
+    vxorps  ymm2, ymm2
+    vxorps  ymm3, ymm3
+    vxorps  ymm4, ymm4
+    vxorps  ymm5, ymm5
+    vxorps  ymm6, ymm6
 
-_sdot:
-    xorps  xmm2, xmm2
-    test   rdx, rdx
-    jz     end
-    mov    rax, rdx
-    mov    rcx, rax
-    shr    rax, 2
-    shl    rax, 4
-    shl    rcx, 2
-    xor    rdx, rdx
-    test   rax, rax
-    jz     tail
+    vxorps  xmm7, xmm7
+    vxorps  xmm8, xmm8
 
-    loop: 
-    movups xmm0,[rdi + rdx]
-    movups xmm1,[rsi + rdx]
-    mulps  xmm0, xmm1
-    addps  xmm2, xmm0
-    add    rdx, 16
-    cmp    rdx, rax
-    jb     loop
-    cmp    rdx, rcx
-    je     end
-
-    tail:
-    movss  xmm0,[rdi + rdx]
-    movss  xmm1,[rsi + rdx]
-    mulss  xmm0, xmm1
-    addss  xmm2, xmm0
-    add    rdx, 4
-    cmp    rdx, rcx
-    jb     tail 
-
-    end:
-    haddps xmm2, xmm2
-    haddps xmm2, xmm2
-    movss  xmm0, xmm2
-    ret
-
-
-
-_unroll_sdot:
-    xorps  xmm2, xmm2
     test   rdx, rdx 
-    jz     end0
+    jz     SEND
     mov    rax, rdx
+
     mov    rcx, rax
-    shr    rax, 0x04
-    shl    rax, 0x06
-    and    rcx, 0x0F
-    mov    rbx,  rcx
-    shr    rcx, 0x02
-    shl    rcx, 0x04
-    shl    rbx,  0x02
+    shr    rax, 0x05
+    shl    rax, 0x07
+    and    rcx, 0x1F
+
+    mov    r11, rcx
+    shr    rcx, 0x03
+    shl    rcx, 0x05
+    and    r11, 0x07
+    
+    mov    r9,  r11
+    shr    r11, 0x02
+    shl    r11, 0x04
+    and    r9,  0x03
+
+    mov    r10, rdx
+    shl    r10,  0x02
 
     xor    rdx, rdx
     test   rax, rax
-    jz     checking
+    jz     SCHECKING0
 
-    unroll_loop4: 
-    movups xmm0,[rdi + rdx]
-    movups xmm1,[rsi + rdx]
-    mulps  xmm0, xmm1
-    addps  xmm2, xmm0
+    SUNROLL_LOOP:
+    vmovups     ymm0, [rdi + rdx]
+    vmovups     ymm1, [rsi + rdx]
+    vfmadd231ps ymm2, ymm0, ymm1
 
-    movups xmm0,[rdi + rdx + 16]
-    movups xmm1,[rsi + rdx + 16]
-    mulps  xmm0, xmm1
-    addps  xmm2, xmm0
+    vmovups     ymm0, [rdi + rdx + 0x20]
+    vmovups     ymm1, [rsi + rdx + 0x20]
+    vfmadd231ps ymm3, ymm0, ymm1
 
-    movups xmm0,[rdi + rdx + 32]
-    movups xmm1,[rsi + rdx + 32]
-    mulps  xmm0, xmm1
-    addps  xmm2, xmm0
+    vmovups     ymm0, [rdi + rdx + 0x40]
+    vmovups     ymm1, [rsi + rdx + 0x40]
+    vfmadd231ps ymm4, ymm0, ymm1
 
-    movups xmm0,[rdi + rdx + 48]
-    movups xmm1,[rsi + rdx + 48]
-    mulps  xmm0, xmm1
-    addps  xmm2, xmm0
+    vmovups     ymm0, [rdi + rdx + 0x60]
+    vmovups     ymm1, [rsi + rdx + 0x60]
+    vfmadd231ps ymm5, ymm0, ymm1
 
-    add    rdx, 0x40
+
+    add    rdx, 0x80
     cmp    rdx, rax
-    jb     unroll_loop4
-    cmp    rdx, rcx
-    je     end0
+    jb     SUNROLL_LOOP
+    cmp    rdx, r10
+    je     SEND
 
-    checking:
+    SCHECKING0:
     test   rcx, rcx
-    jz     tail1 
+    jz     SCHECKING1
 
-    loop1: 
-    movups xmm0,[rdi + rdx]
-    movups xmm1,[rsi + rdx]
-    mulps  xmm0, xmm1
-    addps  xmm2, xmm0
-    add    rdx, 0x10
+    add    rcx,  rax
+
+    SLOOP0:
+    vmovups     ymm0, [rdi + rdx]
+    vmovups     ymm1, [rsi + rdx]
+    vfmadd231ps ymm6, ymm0, ymm1
+    add    rdx, 0x20
     cmp    rdx, rcx
-    jb     loop
-    cmp    rdx, rbx
-    je     end0
+    jb     SLOOP0
+    cmp    rdx, r10
+    je     SEND
 
-    tail1:
-    movss  xmm0,[rdi + rdx]
-    movss  xmm1,[rsi + rdx]
+    SCHECKING1:
+    test   r11, r11
+    jz     STAIL 
+
+    add    r11,  rcx
+
+    SLOOP1:
+    vmovups xmm0, [rdi + rdx]
+    vmovups xmm1, [rsi + rdx]
+    vfmadd231ps xmm7, xmm0, xmm1
+
+    add    rdx,  0x10
+    cmp    rdx,  r11
+    jb     SLOOP1
+    cmp    rdx,  r10
+    je     SEND
+
+    STAIL:
+    movss  xmm0, [rdi + rdx]
+    movss  xmm1, [rsi + rdx]
     mulss  xmm0, xmm1
-    addss  xmm2, xmm0
-    add    rdx, 0x04
-    cmp    rdx, rbx
-    jb     tail1
+    addss  xmm8, xmm0
 
-    end0:
-    haddps xmm2, xmm2
-    haddps xmm2, xmm2
-    movss  xmm0, xmm2
+    add    rdx,  0x04
+    cmp    rdx,  r10
+    jb     STAIL
+
+    SEND:
+    vextractf128 xmm9, ymm2, 1
+    vaddps       xmm2, xmm2, xmm9
+    vhaddps      xmm2, xmm2, xmm2
+    vhaddps      xmm2, xmm2, xmm2
+
+    vextractf128 xmm9, ymm3, 1
+    vaddps       xmm3, xmm3, xmm9
+    vhaddps      xmm3, xmm3, xmm3
+    vhaddps      xmm3, xmm3, xmm3
+
+    vextractf128 xmm9, ymm4, 1
+    vaddps       xmm4, xmm4, xmm9
+    vhaddps      xmm4, xmm4, xmm4
+    vhaddps      xmm4, xmm4, xmm4
+
+    vextractf128 xmm9, ymm5, 1
+    vaddps       xmm5, xmm5, xmm9
+    vhaddps      xmm5, xmm5, xmm5
+    vhaddps      xmm5, xmm5, xmm5
+
+    vextractf128 xmm9, ymm6, 1
+    vaddps       xmm6, xmm6, xmm9
+    vhaddps      xmm6, xmm6, xmm6
+    vhaddps      xmm6, xmm6, xmm6
+
+    vhaddps      xmm7, xmm7, xmm7
+    vhaddps      xmm7, xmm7, xmm7
+
+    vaddss       xmm3, xmm3, xmm2
+    vaddss       xmm4, xmm4, xmm3
+    vaddss       xmm5, xmm5, xmm4
+    vaddss       xmm6, xmm6, xmm5
+    vaddss       xmm7, xmm7, xmm6
+    vaddss       xmm8, xmm8, xmm7
+    movss        xmm0, xmm8
     ret
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;double precision dot product micro kernel;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-us_4_dot:
-    movups xmm0,[rdi]
-    movups xmm1,[rsi]
-    mulps  xmm0, xmm1
-    haddps xmm0, xmm0
-    haddps xmm0, xmm0
-    ret
+DDOT:
+    vxorpd  ymm2, ymm2
+    vxorpd  ymm3, ymm3
+    vxorpd  ymm4, ymm4
+    vxorpd  ymm5, ymm5
 
-us_8_dot:
-    vmovups ymm0,[rdi]
-    vmovups ymm1,[rsi]
-    vmulps  ymm0, ymm1
-    vhaddps ymm0, ymm0
-    vhaddps ymm0, ymm0
-    ret
+    vxorpd   xmm6, xmm6
+    vxorpd   xmm7, xmm7
 
-ud_4_dot:
-    vmovups ymm0,[rdi]
-    vmovups ymm1,[rsi]
-    vmulps  ymm0, ymm1
-    vhaddps ymm0, ymm0
-    vhaddps ymm0, ymm0
+
+    test   rdx, rdx 
+    jz     DEND
+    mov    rax, rdx 
+
+    mov    rcx, rax  ;63
+    shr    rax, 0x04 ;63 >> 4 = 3
+    shl    rax, 0x07 ;384
+    and    rcx, 0x0F ;15
+
+    mov    r11, rcx  ;15
+    shr    rcx, 0x02 ;15 >> 2 = 7
+    shl    rcx, 0x04 ;112
+    and    r11, 0x03 ;3 
+
+    mov    r10, rdx
+    shl    r10, 0x03
+
+    xor    rdx, rdx
+    test   rax, rax
+    jz     DCHECKING0
+
+    DUNROLL_LOOP:
+    vmovupd     ymm0, [rdi + rdx]
+    vmovupd     ymm1, [rsi + rdx]
+    vfmadd231pd ymm2, ymm0, ymm1
+
+    vmovupd     ymm0, [rdi + rdx + 0x20]
+    vmovupd     ymm1, [rsi + rdx + 0x20]
+    vfmadd231pd ymm3, ymm0, ymm1
+
+    vmovupd     ymm0, [rdi + rdx + 0x40]
+    vmovupd     ymm1, [rsi + rdx + 0x40]
+    vfmadd231pd ymm4, ymm0, ymm1
+
+    vmovupd     ymm0, [rdi + rdx + 0x60]
+    vmovupd     ymm1, [rsi + rdx + 0x60]
+    vfmadd231pd ymm5, ymm0, ymm1
+
+    add    rdx, 0x80
+    cmp    rdx, rax
+    jb     DUNROLL_LOOP
+    cmp    rdx, r10
+    je     DEND
+
+    DCHECKING0:
+    test   rcx, rcx
+    jz     DTAIL 
+
+    add    rcx, rax
+
+    DLOOP1:
+    vmovupd xmm0, [rdi + rdx]
+    vmovupd xmm1, [rsi + rdx]
+    vfmadd231pd xmm6, xmm0, xmm1
+
+    add    rdx,  0x10
+    cmp    rdx,  rcx
+    jb     DLOOP1
+    cmp    rdx,  r10
+    je     DEND
+
+    DTAIL:
+    movsd  xmm0, [rdi + rdx]
+    movsd  xmm1, [rsi + rdx]
+    mulsd  xmm0, xmm1
+    addsd  xmm7, xmm0
+
+    add    rdx,  0x08
+    cmp    rdx,  r10
+    jb     DTAIL
+
+    DEND:
+    vextractf128 xmm9, ymm2, 1     
+    vaddpd       xmm2, xmm2, xmm9  
+    vhaddpd      xmm2, xmm2, xmm2
+
+    vextractf128 xmm9, ymm3, 1
+    vaddpd       xmm3, xmm3, xmm9
+    vhaddpd      xmm3, xmm3, xmm3
+
+    vextractf128 xmm9, ymm4, 1
+    vaddpd       xmm4, xmm4, xmm9
+    vhaddpd      xmm4, xmm4, xmm4
+
+    vextractf128 xmm9, ymm5, 1
+    vaddpd       xmm5, xmm5, xmm9
+    vhaddpd      xmm5, xmm5, xmm5
+
+    vhaddpd      xmm6, xmm6, xmm6
+    vhaddpd      xmm7, xmm7, xmm7
+
+    vaddsd       xmm3, xmm2
+    vaddsd       xmm4, xmm3
+    vaddsd       xmm5, xmm4
+    vaddsd       xmm6, xmm5
+    vaddsd       xmm7, xmm6
+    movsd        xmm0, xmm7
     ret

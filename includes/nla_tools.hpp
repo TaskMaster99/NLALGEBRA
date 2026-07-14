@@ -12,6 +12,7 @@
 #define EPSILON32_LV5 1e-15f
 #define EPSILON32_LV6 1e-18f
 
+#define EPSILON64_LV0 1e-1
 #define EPSILON64_LV1 1e-3
 #define EPSILON64_LV2 1e-6
 #define EPSILON64_LV3 1e-9

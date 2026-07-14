@@ -8,6 +8,15 @@
  * @param sx Single-precision scalar vector
  * @param sy Single-precision scalar vector
  * @param N  Size of the vectors
+ *///       rdi          rsi             rdx       rcx
+void SAXPY(float sa, const float* sx, const float* sy, int N);
+
+/**
+ * @brief Single-precision axpy constant times scalar vector plus scalar vector
+ * @param sa Single-precision constant
+ * @param sx Single-precision scalar vector
+ * @param sy Single-precision scalar vector
+ * @param N  Size of the vectors
  */
 void saxpy(float sa, const float* sx, float* sy, int N)
 {
