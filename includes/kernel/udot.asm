@@ -24,18 +24,16 @@ SDOT:
     shl    rax, 0x07
     and    rcx, 0x1F
 
-    mov    r11, rcx
+    mov    r8, rcx
     shr    rcx, 0x03
     shl    rcx, 0x05
-    and    r11, 0x07
+    and    r8, 0x07
     
-    mov    r9,  r11
-    shr    r11, 0x02
-    shl    r11, 0x04
-    and    r9,  0x03
+    shr    r8, 0x02
+    shl    r8, 0x04
 
-    mov    r10, rdx
-    shl    r10,  0x02
+    mov    r9, rdx
+    shl    r9,  0x02
 
     xor    rdx, rdx
     test   rax, rax
@@ -62,7 +60,7 @@ SDOT:
     add    rdx, 0x80
     cmp    rdx, rax
     jb     SUNROLL_LOOP
-    cmp    rdx, r10
+    cmp    rdx, r9
     je     SEND
 
     SCHECKING0:
@@ -78,14 +76,14 @@ SDOT:
     add    rdx, 0x20
     cmp    rdx, rcx
     jb     SLOOP0
-    cmp    rdx, r10
+    cmp    rdx, r9
     je     SEND
 
     SCHECKING1:
-    test   r11, r11
+    test   r8, r8
     jz     STAIL 
 
-    add    r11,  rcx
+    add    r8,  rcx
 
     SLOOP1:
     vmovups xmm0, [rdi + rdx]
@@ -93,9 +91,9 @@ SDOT:
     vfmadd231ps xmm7, xmm0, xmm1
 
     add    rdx,  0x10
-    cmp    rdx,  r11
+    cmp    rdx,  r8
     jb     SLOOP1
-    cmp    rdx,  r10
+    cmp    rdx,  r9
     je     SEND
 
     STAIL:
@@ -105,7 +103,7 @@ SDOT:
     addss  xmm8, xmm0
 
     add    rdx,  0x04
-    cmp    rdx,  r10
+    cmp    rdx,  r9
     jb     STAIL
 
     SEND:
@@ -166,13 +164,11 @@ DDOT:
     shl    rax, 0x07 ;384
     and    rcx, 0x0F ;15
 
-    mov    r11, rcx  ;15
     shr    rcx, 0x02 ;15 >> 2 = 7
     shl    rcx, 0x04 ;112
-    and    r11, 0x03 ;3 
 
-    mov    r10, rdx
-    shl    r10, 0x03
+    mov    r8, rdx
+    shl    r8, 0x03
 
     xor    rdx, rdx
     test   rax, rax
@@ -198,7 +194,7 @@ DDOT:
     add    rdx, 0x80
     cmp    rdx, rax
     jb     DUNROLL_LOOP
-    cmp    rdx, r10
+    cmp    rdx, r8
     je     DEND
 
     DCHECKING0:
@@ -215,7 +211,7 @@ DDOT:
     add    rdx,  0x10
     cmp    rdx,  rcx
     jb     DLOOP1
-    cmp    rdx,  r10
+    cmp    rdx,  r8
     je     DEND
 
     DTAIL:
@@ -225,7 +221,7 @@ DDOT:
     addsd  xmm7, xmm0
 
     add    rdx,  0x08
-    cmp    rdx,  r10
+    cmp    rdx,  r8
     jb     DTAIL
 
     DEND:
