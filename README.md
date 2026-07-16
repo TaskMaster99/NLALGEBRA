@@ -22,3 +22,13 @@ As for now, i've done :
     - [ ] dnorm2
     - [ ] snorminf
     - [ ] dnorminf 
+
+## Build the project
+```
+./scipts/build.sh
+```
+
+## Run the test
+```
+./scipts/test.sh
+```
