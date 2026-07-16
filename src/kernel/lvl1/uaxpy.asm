@@ -5,8 +5,6 @@ section .text
 global SAXPY
 global DAXPY
 
-;xmm0 : salpha, rdi : sx, rsi : sy, rdx : N
-
 SAXPY:
     vbroadcastss ymm0, xmm0
 

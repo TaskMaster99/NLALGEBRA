@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kernel/utils.hpp>
+#include <utils.hpp>
 
 /**
  * @brief Single-precision axpy constant times scalar vector plus scalar vector
