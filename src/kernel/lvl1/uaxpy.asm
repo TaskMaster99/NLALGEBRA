@@ -113,15 +113,6 @@ SAXPY:
     ret
 
 
-
-
-
-
-
-
-
-;xmm0 : dalpha, rdi : dx, rsi : dy, rdx : N
-
 DAXPY:
     vbroadcastsd ymm0, xmm0
 

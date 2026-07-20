@@ -3,6 +3,9 @@
 
 #include <kernel/lvl1/dot.hpp>
 #include <kernel/lvl1/axpy.hpp>
+#include <kernel/lvl1/copy.hpp>
+#include <kernel/lvl1/scal.hpp>
+#include <kernel/lvl1/swap.hpp>
 
 using namespace Catch::Matchers;
 
@@ -156,3 +159,234 @@ TEST_CASE("micro kernel ", "[DAXPY]")
             REQUIRE_THAT(y[k], WithinRel(real_res_y[k], 1e-3));
     }
 }
+
+
+
+TEST_CASE("micro kernel ", "[SCOPY]")
+{
+    const int N = 100;
+    const int p = 10;
+    const int n = 100;
+
+    const float min = -10.0;
+    const float max =  10.0;
+
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist_size(p, n);
+    std::uniform_real_distribution<float> dist_numbers(min, max);
+
+    float x[n] ;
+    float y[n] ;
+
+    for(int i = 0; i < N; ++i)
+    {
+        const int   size  = dist_size(rd);
+
+        for(int j = 0; j < n; ++j)
+            x[j] = dist_numbers(rd);
+
+        SCOPY(x, y, size);
+
+        for(int k = 0; k < size; ++k)
+            REQUIRE_THAT(x[k], WithinRel(y[k], 1e-3f));
+    }
+}
+
+
+TEST_CASE("micro kernel ", "[DCOPY]")
+{
+    const int N = 100;
+    const int p = 10;
+    const int n = 100;
+
+    const double min = -10.0;
+    const double max =  10.0;
+
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist_size(p, n);
+    std::uniform_real_distribution<double> dist_numbers(min, max);
+
+    double x[n] ;
+    double y[n] ;
+
+    for(int i = 0; i < N; ++i)
+    {
+        const int   size  = dist_size(rd);
+
+        for(int j = 0; j < n; ++j)
+            x[j] = dist_numbers(rd);
+
+        DCOPY(x, y, size);
+
+        for(int k = 0; k < size; ++k)
+            REQUIRE_THAT(x[k], WithinRel(y[k], 1e-3));
+    }
+}
+
+
+
+
+TEST_CASE("micro kernel ", "[SSCAL]")
+{
+    const int N = 100;
+    const int p = 10;
+    const int n = 100;
+
+    const float min = -10.0;
+    const double max =  10.0;
+
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist_size(p, n);
+    std::uniform_real_distribution<float> dist_numbers(min, max);
+
+    float x[n] ;
+    float y[n] ;
+
+    float real_y[n] ;
+
+
+    for(int i = 0; i < N; ++i)
+    {
+        const int   size  = dist_size(rd);
+        const float scal = dist_numbers(rd);
+
+        for(int j = 0; j < n; ++j)
+        {
+            x[j] = dist_numbers(rd);
+            real_y[j] = scal*x[j];
+        }
+
+        SSCAL(scal, x, y, size);
+
+        for(int k = 0; k < size; ++k)
+        {
+            REQUIRE_THAT(y[k], WithinRel(real_y[k], 1e-3f));
+        }
+    }
+}
+
+
+TEST_CASE("micro kernel ", "[DSCAL]")
+{
+    const int N = 100;
+    const int p = 10;
+    const int n = 100;
+
+    const double min = -10.0;
+    const double max =  10.0;
+
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist_size(p, n);
+    std::uniform_real_distribution<double> dist_numbers(min, max);
+
+    double x[n] ;
+    double y[n] ;
+
+    double real_y[n] ;
+
+
+    for(int i = 0; i < N; ++i)
+    {
+        const int   size  = dist_size(rd);
+        const double scal = dist_numbers(rd);
+
+        for(int j = 0; j < n; ++j)
+        {
+            x[j] = dist_numbers(rd);
+            real_y[j] = scal*x[j];
+        }
+
+        DSCAL(scal, x, y, size);
+
+        for(int k = 0; k < size; ++k)
+        {
+            REQUIRE_THAT(y[k], WithinRel(real_y[k], 1e-3));
+        }
+    }
+}
+
+
+TEST_CASE("micro kernel ", "[SSWAP]")
+{
+    const int N = 100;
+    const int p = 10;
+    const int n = 100;
+
+    const float min = -10.0;
+    const float max =  10.0;
+
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist_size(p, n);
+    std::uniform_real_distribution<float> dist_numbers(min, max);
+
+    float x[n] ;
+    float y[n] ;
+    float real_x[n] ;
+    float real_y[n] ;
+
+
+    for(int i = 0; i < N; ++i)
+    {
+        const int   size  = dist_size(rd);
+
+        for(int j = 0; j < n; ++j)
+        {
+            x[j] = dist_numbers(rd);
+            y[j] = dist_numbers(rd);
+            real_x[j] = y[j];
+            real_y[j] = x[j];
+        }
+
+        SSWAP(x, y, size);
+
+        for(int k = 0; k < size; ++k)
+        {
+            REQUIRE_THAT(x[k], WithinRel(real_x[k], 1e-3f));
+            REQUIRE_THAT(y[k], WithinRel(real_y[k], 1e-3f));
+
+        }
+    }
+}
+
+TEST_CASE("micro kernel ", "[DSWAP]")
+{
+    const int N = 100;
+    const int p = 10;
+    const int n = 100;
+
+    const double min = -10.0;
+    const double max =  10.0;
+
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist_size(p, n);
+    std::uniform_real_distribution<double> dist_numbers(min, max);
+
+    double x[n] ;
+    double y[n] ;
+    double real_x[n] ;
+    double real_y[n] ;
+
+
+    for(int i = 0; i < N; ++i)
+    {
+        const int   size  = dist_size(rd);
+
+        for(int j = 0; j < n; ++j)
+        {
+            x[j] = dist_numbers(rd);
+            y[j] = dist_numbers(rd);
+            real_x[j] = y[j];
+            real_y[j] = x[j];
+        }
+
+        DSWAP(x, y, size);
+
+        for(int k = 0; k < size; ++k)
+        {
+            REQUIRE_THAT(x[k], WithinRel(real_x[k], 1e-3));
+            REQUIRE_THAT(y[k], WithinRel(real_y[k], 1e-3));
+
+        }
+    }
+}
+

@@ -5,13 +5,20 @@ add_library(nla::nla ALIAS nla.nla)
 set(LEVEL_1_HEADERS
     kernel/lvl1/dot.hpp
     kernel/lvl1/axpy.hpp
+    kernel/lvl1/scal.hpp
+    kernel/lvl1/copy.hpp
+    kernel/lvl1/swap.hpp
+
     utils.hpp   
 )
 
 set(LEVEL_1_SOURCES
     ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/udot.asm
     ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/uaxpy.asm
-    ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/uscal.asm   
+    ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/uscal.asm
+    ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/ucopy.asm
+    ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/uswap.asm
+
 )
 
 set(INCLUDE_FILES

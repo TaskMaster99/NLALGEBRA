@@ -10,12 +10,12 @@ As for now, i've done :
     - [x] ddot
     - [x] saxpy
     - [x] daxpy 
-    - [ ] sscal
-    - [ ] dscal
-    - [ ] sswap
-    - [ ] dswap
-    - [ ] scopy
-    - [ ] dcopy
+    - [x] sscal
+    - [x] dscal
+    - [x] sswap
+    - [x] dswap
+    - [x] scopy
+    - [x] dcopy
     - [ ] snorm1
     - [ ] dnorm1
     - [ ] snorm2
