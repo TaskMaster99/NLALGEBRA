@@ -2,11 +2,11 @@ section .data
 section .bss
 section .text
 
-global SSWAP
-global DSWAP
+global x86__SSWAP__
+global x86__DSWAP__
 
 
-SSWAP:
+x86__SSWAP__:
     test   edx, edx 
     jz     SEND
     mov    eax, edx
@@ -109,7 +109,7 @@ SSWAP:
     ret
 
 
-DSWAP:
+x86__DSWAP__:
     test   edx, edx 
     jz     DEND
     mov    eax, edx

@@ -39,5 +39,10 @@
 #define dB(i,j) dB[j * N + i]
 #define dC(i,j) dC[j * N + i]
 
-#define COMPATIBLE_128BIT 4
-#define COMPATIBLE_256BIT 8
+template<typename T>
+[[gnu::always_inline]] inline constexpr void swap(T& a, T& b)
+{
+    T temp = a;
+    a = b;
+    b = temp;
+}

@@ -2,10 +2,12 @@ section .data
 section .bss
 section .text
 
-global SCOPY
-global DCOPY
+global x86__SSCAL__
+global x86__DSCAL__
 
-SCOPY:
+x86__SSCAL__:
+    vbroadcastss ymm0, xmm0
+
     test   edx, edx 
     jz     SEND
     mov    eax, edx
@@ -31,15 +33,22 @@ SCOPY:
     jz     SCHECKING0
 
     SUNROLL_LOOP:
-    vmovups     ymm1, [rsi + rdx]
-    vmovups     ymm2, [rsi + rdx + 0x20]
-    vmovups     ymm3, [rsi + rdx + 0x40]
-    vmovups     ymm4, [rsi + rdx + 0x60]
+    vmovups     ymm1, [rdi + rdx]
+    vmulps      ymm1, ymm0
 
-    vmovups     [rdi + rdx],        ymm1
-    vmovups     [rdi + rdx + 0x20], ymm2
-    vmovups     [rdi + rdx + 0x40], ymm3
-    vmovups     [rdi + rdx + 0x60], ymm4
+    vmovups     ymm2, [rdi + rdx + 0x20]
+    vmulps      ymm2, ymm0
+
+    vmovups     ymm3, [rdi + rdx + 0x40]
+    vmulps      ymm3, ymm0
+
+    vmovups     ymm4, [rdi + rdx + 0x60]
+    vmulps      ymm4, ymm0
+
+    vmovups      [rsi + rdx],        ymm1
+    vmovups      [rsi + rdx + 0x20], ymm2
+    vmovups      [rsi + rdx + 0x40], ymm3
+    vmovups      [rsi + rdx + 0x60], ymm4
 
     add    rdx, 0x80
     cmp    rdx, rax
@@ -54,8 +63,10 @@ SCOPY:
     add    rcx,  rax
 
     SLOOP0:
-    vmovups     ymm5,         [rsi + rdx]
-    vmovups     [rdi + rdx],  ymm5
+    vmovups     ymm5,  [rdi + rdx]
+    vmulps      ymm5, ymm0
+
+    vmovups      [rsi + rdx],  ymm5
 
     add    rdx, 0x20
     cmp    rdx, rcx
@@ -70,8 +81,10 @@ SCOPY:
     add    r8,  rcx
 
     SLOOP1:
-    vmovups     xmm6,         [rsi + rdx]
-    vmovups     [rdi + rdx],  xmm6
+    vmovups     xmm6, [rdi + rdx]
+    vmulps      xmm6, xmm0
+
+    vmovups      [rsi + rdx],  xmm6
 
     add    rdx,  0x10
     cmp    rdx,  r8
@@ -80,8 +93,10 @@ SCOPY:
     je     SEND
 
     STAIL:
-    vmovss      xmm7,         [rsi + rdx]    
-    vmovss      [rdi + rdx],  xmm7
+    vmovss      xmm7, [rdi + rdx]
+    vmulss      xmm7, xmm0
+    
+    vmovss      [rsi + rdx],  xmm7
 
     add    rdx,  0x04
     cmp    rdx,  r9
@@ -91,7 +106,9 @@ SCOPY:
     ret
 
 
-DCOPY:
+x86__DSCAL__:
+    vbroadcastsd ymm0, xmm0
+
     test   edx, edx 
     jz     DEND
     mov    eax, edx
@@ -112,15 +129,22 @@ DCOPY:
     jz     DCHECKING0
 
     DUNROLL_LOOP:
-    vmovupd     ymm1, [rsi + rdx]
-    vmovupd     ymm2, [rsi + rdx + 0x20]
-    vmovupd     ymm3, [rsi + rdx + 0x40]
-    vmovupd     ymm4, [rsi + rdx + 0x60]
+    vmovupd     ymm1, [rdi + rdx]
+    vmulpd      ymm1, ymm0
 
-    vmovupd      [rdi + rdx],        ymm1
-    vmovupd      [rdi + rdx + 0x20], ymm2
-    vmovupd      [rdi + rdx + 0x40], ymm3
-    vmovupd      [rdi + rdx + 0x60], ymm4
+    vmovupd     ymm2, [rdi + rdx + 0x20]
+    vmulpd      ymm2, ymm0
+
+    vmovupd     ymm3, [rdi + rdx + 0x40]
+    vmulpd      ymm3, ymm0
+
+    vmovupd     ymm4, [rdi + rdx + 0x60]
+    vmulpd      ymm4, ymm0
+
+    vmovupd      [rsi + rdx],        ymm1
+    vmovupd      [rsi + rdx + 0x20], ymm2
+    vmovupd      [rsi + rdx + 0x40], ymm3
+    vmovupd      [rsi + rdx + 0x60], ymm4
 
     add    rdx, 0x80
     cmp    rdx, rax
@@ -135,18 +159,22 @@ DCOPY:
     add    rcx,  rax
 
     DLOOP1:
-    vmovupd     ymm5, [rsi + rdx]
-    vmovupd     [rdi + rdx],  ymm5
+    vmovupd     xmm5, [rdi + rdx]
+    vmulpd      xmm5, xmm0
 
-    add    rdx,  0x20
+    vmovupd      [rsi + rdx],  xmm5
+
+    add    rdx,  0x10
     cmp    rdx,  rcx
     jb     DLOOP1
     cmp    rdx,  r8
     je     DEND
 
     DTAIL:
-    vmovsd      xmm6, [rsi + rdx]    
-    vmovsd      [rdi + rdx],  xmm6
+    vmovsd      xmm6, [rdi + rdx]
+    vmulsd      xmm6, xmm0
+    
+    vmovsd      [rsi + rdx],  xmm6
 
     add    rdx,  0x08
     cmp    rdx,  r8

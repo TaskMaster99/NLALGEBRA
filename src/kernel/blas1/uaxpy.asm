@@ -2,10 +2,10 @@ section .data
 section .bss
 section .text
 
-global SAXPY
-global DAXPY
+global x86__SAXPY__
+global x86__DAXPY__
 
-SAXPY:
+x86__SAXPY__:
     vbroadcastss ymm0, xmm0
 
     test   edx, edx 
@@ -113,7 +113,7 @@ SAXPY:
     ret
 
 
-DAXPY:
+x86__DAXPY__:
     vbroadcastsd ymm0, xmm0
 
     test   edx, edx 

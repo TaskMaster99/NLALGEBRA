@@ -2,11 +2,11 @@ section .data
 section .bss
 section .text
 
-global SNORM2
-global DNORM2
+global x86__SNORM2__
+global x86__DNORM2__
 
 
-SNORM2:
+x86__SNORM2__:
     vxorps  ymm2, ymm2
     vxorps  ymm3, ymm3
     vxorps  ymm4, ymm4
@@ -149,7 +149,7 @@ SNORM2:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;double precision dot product micro kernel;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-DNORM2:
+x86__DNORM2__:
     vxorpd  ymm2, ymm2
     vxorpd  ymm3, ymm3
     vxorpd  ymm4, ymm4

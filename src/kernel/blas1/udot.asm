@@ -2,10 +2,10 @@ section .data
 section .bss
 section .text
 
-global SDOT
-global DDOT
+global x86__SDOT__
+global x86__DDOT__
 
-SDOT:
+x86__SDOT__:
     vxorps  ymm2, ymm2
     vxorps  ymm3, ymm3
     vxorps  ymm4, ymm4
@@ -145,7 +145,7 @@ SDOT:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;double precision dot product micro kernel;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-DDOT:
+x86__DDOT__:
     vxorpd  ymm2, ymm2
     vxorpd  ymm3, ymm3
     vxorpd  ymm4, ymm4

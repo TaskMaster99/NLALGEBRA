@@ -2,31 +2,31 @@ add_library(nla.nla SHARED)
 
 add_library(nla::nla ALIAS nla.nla)
 
-set(LEVEL_1_HEADERS
-    kernel/lvl1/dot.hpp
-    kernel/lvl1/axpy.hpp
-    kernel/lvl1/scal.hpp
-    kernel/lvl1/copy.hpp
-    kernel/lvl1/swap.hpp
+set(BLAS_1_HEADERS
+    kernel/blas1/dot.hpp
+    kernel/blas1/axpy.hpp
+    kernel/blas1/scal.hpp
+    kernel/blas1/copy.hpp
+    kernel/blas1/swap.hpp
 
     utils.hpp   
 )
 
-set(LEVEL_1_SOURCES
-    ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/udot.asm
-    ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/uaxpy.asm
-    ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/uscal.asm
-    ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/ucopy.asm
-    ${PROJECT_SOURCE_DIR}/src/kernel/lvl1/uswap.asm
+set(BLAS_1_SOURCES
+    ${PROJECT_SOURCE_DIR}/src/kernel/blas1/udot.asm
+    ${PROJECT_SOURCE_DIR}/src/kernel/blas1/uaxpy.asm
+    ${PROJECT_SOURCE_DIR}/src/kernel/blas1/uscal.asm
+    ${PROJECT_SOURCE_DIR}/src/kernel/blas1/ucopy.asm
+    ${PROJECT_SOURCE_DIR}/src/kernel/blas1/uswap.asm
 
 )
 
 set(INCLUDE_FILES
-    ${LEVEL_1_HEADERS}
+    ${BLAS_1_HEADERS}
 )
 
 set(SRC_FILES
-    ${LEVEL_1_SOURCES}
+    ${BLAS_1_SOURCES}
 )
 
 target_sources(nla.nla PUBLIC FILE_SET HEADERS BASE_DIRS ${CMAKE_SOURCE_DIR}/includes FILES ${INCLUDE_FILES})
